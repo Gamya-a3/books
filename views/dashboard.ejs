@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOOKS-HUNT</title>
+    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-auth.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        /* Basic styles for the page */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f2f2f2;
+        }
+
+        /* Navigation bar styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgb(0, 47, 128);
+            padding: 10px;
+            color: #fff;
+        }
+
+        /* Logo and project name */
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* Navigation links */
+        .nav-links {
+            list-style: none;
+            display: flex;
+        }
+
+        .nav-links li {
+            margin-right: 20px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #fff;
+        }
+
+        /* Search container styles */
+        .search-container {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        .search-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .search-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Empty data display tag */
+        .data-display {
+        margin-top: 20px;
+        padding: 20px;
+        border-radius: 5px;
+        color: #333;
+        border: #f2f2f2;
+        
+        }
+        
+        
+
+
+        /* Logout and about us buttons */
+        .logout-button, .about-us-button {
+            background-color: rgb(0, 38, 128);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        body, html {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%; /* Set the height to 100% to cover the entire viewport */
+            background-image: linear-gradient(to bottom, #ccc, #999); /* Gray gradient */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #fff;
+        }
+
+        .logout-button:hover, .about-us-button:hover {
+            background-color: rgb(0, 64, 255);
+        }
+
+        /* Centered text */
+        .text-center {
+            text-align: center;
+        }
+
+      
+
+        
+        .search-text {
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* Add a subtle shadow */
+        }
+
+        .links-text {
+            font-size: 20px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="logo">A BOOK-HUNT</div>
+        <ul class="nav-links">
+            <li><a href="/" class="logout-button">Logout</a></li>
+            
+        </ul>
+    </div>
+
+    <p class="text-center search-text">EXPLORE</p>
+    <div class="search-container">
+        <input type="text" class="search-box" placeholder="Enter book title...">
+        <button class="search-button">Search</button>
+    </div><br><br>
+    <b><p class="text-center links-text">Books</p></b>
+    <div class="data-display">
+        <!-- Data will be displayed here after searching -->
+    </div>
+
+    <script>
+        const searchBox = document.querySelector('.search-box');
+        const searchButton = document.querySelector('.search-button');
+        const dataDisplay = document.querySelector('.data-display');
+
+        searchButton.addEventListener('click', () => {
+            const bookTitle = searchBox.value.trim(); // Now, it's a book title
+
+            if (bookTitle) {
+                // Changed the search parameter to 'intitle' to search by book title
+                axios
+                    .get(`https://www.googleapis.com/books/v1/volumes?q=intitle:"${encodeURIComponent(bookTitle)}"`)
+                    .then((response) => {
+                        const books = response.data.items;
+
+                        dataDisplay.innerHTML = '';
+
+                        if (books && books.length > 0) {
+                            const resultList = document.createElement('ul');
+
+                            books.forEach((book) => {
+                                const title = book.volumeInfo.title;
+                                const authors = book.volumeInfo.authors ? book.volumeInfo.authors.join(', ') : 'Unknown Author';
+                                const previewLink = book.volumeInfo.previewLink; 
+
+                                const listItem = document.createElement('li');
+                                listItem.innerHTML = `<a href="${previewLink}" target="_blank"><strong>${title}</strong></a> by ${authors}`;
+
+                                resultList.appendChild(listItem);
+                            });
+
+                            dataDisplay.appendChild(resultList);
+                        } else {
+                            dataDisplay.textContent = 'No results found';
+                        }
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        dataDisplay.textContent = 'An error occurred while searching.';
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>
